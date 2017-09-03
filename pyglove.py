@@ -16,6 +16,12 @@ class NotifyHandler(DefaultDelegate):
             print(data)
 
 
+# Write Function
+def write(hand,value):
+    hand.writeCharacteristic(rwHandle,value);
+
+
+
 leftHand = Peripheral("a4:d5:78:0d:07:a2")
 #rightHand = btle.Peripheral(" MAC Addr Here ")"
 
@@ -27,7 +33,10 @@ leftHand.withDelegate(NotifyHandler())
 # Main Function
 
 while True:
-    leftHand.writeCharacteristic(rwHandle,"1234")
+    #Write 1234 to Arduino
+    write(leftHand,"1234")
+
+    #if answer from arduino received, call handleNotification() 
     if leftHand.waitForNotifications(1.0):
         continue
 
