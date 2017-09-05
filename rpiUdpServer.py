@@ -10,26 +10,45 @@ class RpiUdpServer(threading.Thread):
         self.PORT = PORT
         self.BUFSIZE=1024
         ADDR = (HOST,PORT)
-        self.listener = listener
         self.udpServer = socket(AF_INET,SOCK_DGRAM)
         self.udpServer.bind(ADDR)
-        
+        self.listener = listener
+        self.ClientAddr = None
+    def addBleClient(self,bleCli):
+        self.bleClient = bleCli
+
     def run(self):
         print("Waiting for messages")
-        
         data, addr = self.udpServer.recvfrom(self.BUFSIZE)
         self.ClientAddr = addr
-         
         while True:
 
             data, addr = self.udpServer.recvfrom(self.BUFSIZE)
-            self.listener(data)
+            self.listener(data,self.bleClient)
                      
     def send(self,message):
-        self.udpServer.sendto('[%s] %s' % (ctime(),message),self.ClientAddr)
+        if self.ClientAddr is not None:
+            self.udpServer.sendto(message,self.ClientAddr)
+            print("send to PC : %s" % message)
+        else : 
+            print("Udp Server not Ready!")
 
     def __del__(self):
         self.udpServer.close()
 
 
-        
+if __name__=="__main__":
+    def MyListener(data):
+        print(data)
+        udpServer.send("Hi Unity!")
+
+
+    HOST = ''
+    PORT = 7000
+    udpServer = RpiUdpServer(HOST,PORT,MyListener)
+    udpServer.daemon=True
+    udpServer.start()
+    import time
+    while True:
+        time.sleep(1000)
+
