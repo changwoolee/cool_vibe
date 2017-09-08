@@ -1,6 +1,5 @@
-from socket import *
+import socket
 import threading
-from time import ctime
 import sys
 
 class RpiUdpServer(threading.Thread):
@@ -10,7 +9,7 @@ class RpiUdpServer(threading.Thread):
         self.PORT = PORT
         self.BUFSIZE=1024
         ADDR = (HOST,PORT)
-        self.udpServer = socket(AF_INET,SOCK_DGRAM)
+        self.udpServer = socket.socket(socket.AF_INET,socket.SOCK_DGRAM)
         self.udpServer.bind(ADDR)
         self.listener = listener
         self.ClientAddr = None
