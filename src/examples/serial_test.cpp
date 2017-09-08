@@ -3,7 +3,7 @@
 
 int main(void){
 	UsbSerial left_hand("/dev/ttyACM0",115200);
-	if(left_hand.StartInternalThread()){
+	if(!left_hand.StartInternalThread()){
 		std::cout<<"Cannot Run recv module"<<std::endl;
 	}
 
