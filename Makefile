@@ -2,6 +2,7 @@ CC = g++
 CFLAGS = -W -Wall
 serial_test = build/examples/serial_test
 udp_test = build/examples/udp_test
+comm_test = build/examples/comm_test
 
 MODULES = serial udp temp_control common examples
 SRC_DIR = $(addprefix src/,$(MODULES))
@@ -13,8 +14,18 @@ OBJ_1 = $(patsubst src/%.cpp,build/%.o,$(SRC_1))
 SRC_2 = $(foreach sdir, $(SRC_DIR),$(wildcard $(sdir)/*udp*.cpp))
 OBJ_2 = $(patsubst src/%.cpp, build/%.o,$(SRC_2))
 
-SRC = $(foreach sdir,$(SRC_DIR),$(wildcard $(sdir)/*.cpp))
+SRC_3 := $(foreach sdir, $(SRC_DIR),$(wildcard $(sdir)/*.cpp))
+SRC_3 := $(filter-out src/examples/udp_test.cpp, $(SRC_3))
+SRC_3 := $(filter-out src/examples/serial_test.cpp,$(SRC_3))
+
+OBJ_3 = $(patsubst src/%.cpp,build/%.o,$(SRC_3))
+
+
+SRC := $(foreach sdir,$(SRC_DIR),$(wildcard $(sdir)/*.cpp))
+SRC := $(filter-out src/examples/*.cpp,$(SRC))
 OBJ = $(patsubst src/%.cpp,build/%.o,$(SRC))
+
+
 INCLUDES = $(addprefix -I,$(SRC_DIR))
 LDFLAGS = -lpthread
 
@@ -29,7 +40,7 @@ endef
 
 
 
-all : checkdirs $(serial_test) $(udp_test)
+all : checkdirs $(comm_test)
 
 checkdirs : $(BUILD_DIR)
 
@@ -40,6 +51,9 @@ $(serial_test) : $(OBJ_1)
 	$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS)
 $(udp_test) : $(OBJ_2)
 	$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS)
+$(comm_test) : $(OBJ_3)
+	$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS)
+
 
 clean : 
 	@rm -rf $(BUILD_DIR)

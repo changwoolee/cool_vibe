@@ -10,15 +10,19 @@ UsbSerial::UsbSerial(char* PORT, int baud_rate):MyThreadClass(){
 	}
 
 
-	set_interface_attribs(fd,this->baud_rate,0); // 115200, 8N1
+	set_interface_attribs(fd,this->baud_rate); // baud rate : 115200
 
+}
+
+UsbSerial::UsbSerial(char* PORT, int baud_rate, UdpServer *udpServer):UsbSerial(PORT,baud_rate){
+	this->udpServer = udpServer;
 }
 
 UsbSerial::~UsbSerial(){
 	close(fd);
 }
 
-void UsbSerial::set_interface_attribs(int fd,int baud_rate,int parity){
+void UsbSerial::set_interface_attribs(int fd,int baud_rate){
 	struct termios newtio;
 	memset(&newtio,0,sizeof(newtio));
 	newtio.c_iflag = IGNPAR;
@@ -79,17 +83,27 @@ void UsbSerial::recv(){
 		std::string port_name = this->PORT;
 		std::cout<<"Warning : No data from "<<port_name<<std::endl;
 	}
+
+	udpServer->send(buffer,buf_index);
+
+
+	
+
+
+#ifdef DEBUG
 	for(int i=0;i<buf_index+1;i++){
 		std::cout<<buffer[i];
 	}
 	std::cout<<"\n";
-
+#endif
 }
 
 
 		
 	
 	
-		
+void UsbSerial::setUdpServer(UdpServer *udpServer){
+	this->udpServer=udpServer;
+}	
 
 

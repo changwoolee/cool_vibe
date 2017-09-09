@@ -1,5 +1,5 @@
 #include "udp_server.h"
-
+#include "../serial/usb_serial.h"
 
 UdpServer::UdpServer(int port):MyThreadClass(){
 	if((this->server_socket = socket(PF_INET,SOCK_DGRAM,0))<0){
@@ -22,7 +22,13 @@ UdpServer::UdpServer(int port):MyThreadClass(){
 	}
 
 }
+UdpServer::UdpServer(int port, UsbSerial *leftHand):UdpServer(port){
+	this->leftHand = leftHand;
+}
 
+UdpServer::UdpServer(int port, UsbSerial *leftHand, UsbSerial *rightHand):UdpServer(port,leftHand){
+	this->rightHand = rightHand;
+}
 UdpServer::~UdpServer(){
 	close(server_socket);
 }
@@ -39,15 +45,29 @@ void UdpServer::recv(){
 	int buf_len = recvfrom(server_socket,buffer,sizeof(buffer),0,(sockaddr*)&clientaddr,
 			(socklen_t*)&addr_length);
 	
-	// motor & peltier control()
+
+
+	// control motor & peltier
+	commandControl(buffer, buf_len);	
 	
+	
+#ifdef DEBUG	
 	for(int i=0;i<buf_len;i++){
 		cout<<buffer[i];
 	}
 	cout<<endl;
+#endif
 
 }
 
+void UdpServer::commandControl(char* buffer, int length){
+	
+	// Analyse Command
+	
+
+	// send vibration info to gloves
+	leftHand->send(buffer,length);
+}
 
 void UdpServer::InternalThreadEntry(){
 	while(1){
@@ -58,4 +78,17 @@ void UdpServer::InternalThreadEntry(){
 
 
 	
+void UdpServer::setLeftHand(UsbSerial *leftHand){
+	this->leftHand = leftHand;
+}
+
+void UdpServer::setRightHand(UsbSerial *rightHand){
+	this->rightHand = rightHand;
+}
+
+void UdpServer::setHands(UsbSerial *leftHand, UsbSerial *rightHand){
+	setLeftHand(leftHand);
+	setRightHand(rightHand);
+}
+
 
