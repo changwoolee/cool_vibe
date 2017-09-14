@@ -178,11 +178,14 @@ void Temp::controlPeltier(double temp){
 
 
 void Temp::receiveMessage(char *message, int length){
-	if(length<2){
+	if(length<3){
 		cout<<"Invalid Peltier Command. Too short\n";
 		return;
 	}
-
+	if(message[length-1]!='e'){
+		cout<<"Invalid Peltier Command.\n";
+		return;
+	}
 	int mode = message[0]=='c' ? (LOW) : (HIGH);
 	int pwmVal = (int)message[1];
 

@@ -94,16 +94,18 @@ void UdpServer::commandControl(char* buffer, int length){
 
 	char mode = buffer[1];
 	char hand = buffer[2];
-	char cmd[3] = {buffer[3],buffer[4],buffer[5]};
 	// Peltier(Temp) Mode
 	if(mode=='p'){
+		char cmd[2] = {buffer[3],buffer[4],buffer[5]};
 		Temp* tempModule = (hand=='l') ? leftTempUnit : rightTempUnit;
 		tempModule->receiveMessage(cmd,3);
 	}
 	// Vibration Mode
-	else if(mode=='v'){
+	else if(mode=='v')
+	{
+		char cmd[4] = {buffer[3],buffer[4],0,buffer[5]};
 		UsbSerial* serialHand = (hand=='l') ? leftHand : rightHand;
-		serialHand->send(cmd,3);
+		serialHand->send(cmd,4);
 
 	}
 
