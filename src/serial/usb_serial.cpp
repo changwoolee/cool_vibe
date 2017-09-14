@@ -47,6 +47,10 @@ void UsbSerial::set_interface_attribs(int fd,int baud_rate){
 }
 
 	
+void UsbSerial::setTempUnits(Temp *lhand, Temp *rhand){
+	leftTempUnit = lhand;
+	rightTempUnit = rhand;
+}
 
 void UsbSerial::send(char* data,int size){
 	int wr = write(fd,data,size);	

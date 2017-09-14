@@ -10,11 +10,13 @@
 #include <unistd.h>
 #include <iostream>
 #include "../common/my_thread.h"
+#include "../temp_control/temp.h"
+
 //#include "../serial/usb_serial.h"
 
 class UsbSerial;
 
-using namespace std;
+//using namespace std;
 
 class UdpServer : public MyThreadClass{
 public:
@@ -26,7 +28,7 @@ public:
 	void send(char* data, int length);
 	void recv();
 
-
+	void setTempUnits(Temp* lhand, Temp* rhand);
 
 	void setLeftHand(UsbSerial *leftHand);
 	void setRightHand(UsbSerial *rightHand);
@@ -39,20 +41,15 @@ private:
 	int port;
 	struct sockaddr_in clientaddr;
 	int addr_length;
-	
+	Temp *leftTempUnit, *rightTempUnit;
 	UsbSerial *leftHand, *rightHand;
 
 	char buffer[100];
 
 	void commandControl(char* buffer, int length);
 
+
 };
-
-
-
-
-
-
 
 
 #endif /* __UDP_SERVER_H__ */

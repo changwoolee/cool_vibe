@@ -3,8 +3,11 @@ CFLAGS = -W -Wall
 serial_test = build/examples/serial_test
 udp_test = build/examples/udp_test
 comm_test = build/examples/comm_test
+TARGET = build/cool_vibe
 
-MODULES = serial udp temp_control common examples
+BUILD_ROOT = ./build
+
+MODULES = serial udp temp_control common examples core
 SRC_DIR = $(addprefix src/,$(MODULES))
 BUILD_DIR = $(addprefix build/,$(MODULES))
 
@@ -22,12 +25,12 @@ OBJ_3 = $(patsubst src/%.cpp,build/%.o,$(SRC_3))
 
 
 SRC := $(foreach sdir,$(SRC_DIR),$(wildcard $(sdir)/*.cpp))
-SRC := $(filter-out src/examples/*.cpp,$(SRC))
+SRC := $(filter-out $(wildcard src/examples/*.cpp),$(SRC))
 OBJ = $(patsubst src/%.cpp,build/%.o,$(SRC))
 
 
 INCLUDES = $(addprefix -I,$(SRC_DIR))
-LDFLAGS = -lpthread
+LDFLAGS = -lwiringPi -lpthread
 
 vpath %.cpp $(SRC_DIR)
 
@@ -40,7 +43,7 @@ endef
 
 
 
-all : checkdirs $(comm_test)
+all : checkdirs $(TARGET)
 
 checkdirs : $(BUILD_DIR)
 
@@ -53,10 +56,11 @@ $(udp_test) : $(OBJ_2)
 	$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS)
 $(comm_test) : $(OBJ_3)
 	$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS)
-
+$(TARGET) : $(OBJ)
+	$(CC) $(CFLAGS) $^ -o $@ $(LDFLAGS)
 
 clean : 
-	@rm -rf $(BUILD_DIR)
+	@rm -rf $(BUILD_ROOT)
 
 rebuild : clean all
 

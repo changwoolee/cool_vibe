@@ -33,6 +33,11 @@ UdpServer::~UdpServer(){
 	close(server_socket);
 }
 
+void UdpServer::setTempUnits(Temp* lhand, Temp* rhand){
+	leftTempUnit = lhand;
+	rightTempUnit = rhand;
+}
+
 
 void UdpServer::send(char* data, int length){
 
@@ -53,7 +58,8 @@ void UdpServer::recv(){
 	
 #ifdef DEBUG	
 	for(int i=0;i<buf_len;i++){
-		cout<<buffer[i];
+		int j = (int) buffer[i];
+		printf("%x",j);
 	}
 	cout<<endl;
 #endif
@@ -63,7 +69,9 @@ void UdpServer::recv(){
 void UdpServer::commandControl(char* buffer, int length){
 	
 	// Analyse Command
-	
+	// TO DO : check left or right 
+	// 	   check peltier or vibe
+	// 	   handle command	
 
 	// send vibration info to gloves
 	leftHand->send(buffer,length);

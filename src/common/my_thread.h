@@ -1,6 +1,6 @@
 #ifndef __MY_THREAD_H__
 #define __MY_THREAD_H__
-
+#define DEBUG
 #include <pthread.h>
 class MyThreadClass
 {
