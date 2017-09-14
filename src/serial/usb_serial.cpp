@@ -9,7 +9,7 @@ UsbSerial::UsbSerial(char* PORT, int baud_rate):MyThreadClass(){
 		exit(1);
 	}
 
-
+	test_mode=0;
 	set_interface_attribs(fd,this->baud_rate); // baud rate : 115200
 
 }
@@ -46,10 +46,12 @@ void UsbSerial::set_interface_attribs(int fd,int baud_rate){
 	tcsetattr(fd,TCSANOW,&newtio);
 }
 
-	
-void UsbSerial::setTempUnits(Temp *lhand, Temp *rhand){
-	leftTempUnit = lhand;
-	rightTempUnit = rhand;
+void UsbSerial::setTestMode(int mode){
+	test_mode = mode;
+}
+
+void UsbSerial::setTempUnit(Temp *tempUnit){
+	this->tempUnit = tempUnit;
 }
 
 void UsbSerial::send(char* data,int size){
@@ -59,6 +61,13 @@ void UsbSerial::send(char* data,int size){
 		std::cout<<"Error : Cannot write serial port "
 			<<port_name<<std::endl;
 	}
+	if(test_mode){
+		for(int i=0;i<size;i++){
+			std::cout<<data[i];
+		}
+		std::cout<<"\n";
+	}
+
 }
 void UsbSerial::InternalThreadEntry(){
 	while(1){
@@ -67,15 +76,17 @@ void UsbSerial::InternalThreadEntry(){
 	}
 }
 void UsbSerial::recv(){
-	char buffer[100];	
+	char buffer[10];	
 	int n=0;
 	int buf_index=0;
 	char buf = '\0';
 
 	do{
 		n = read(fd,&buf,1);
-		buffer[buf_index] = buf;
-		buf_index += n;
+		if(buf>='0' && buf<='9'){
+			buffer[buf_index] = buf;
+			buf_index += n;
+		}
 	}while(buf != '\n' && n>0);
 
 	if(n<0){
@@ -87,19 +98,46 @@ void UsbSerial::recv(){
 		std::string port_name = this->PORT;
 		std::cout<<"Warning : No data from "<<port_name<<std::endl;
 	}
-
-	udpServer->send(buffer,buf_index);
-
-
+	int raw_data = atoi(buffer); 
 	
+	// push temp information to Temp Unit.
+	tempUnit->setTemp(raw_data);
+	// after setTemp() called, Temp Unit will handle temperature function.
+	
+	// Send Temp Information to Host using UDP.	
+	sendTempMessageToHost( tempUnit->getTempInfo() );
 
 
-#ifdef DEBUG
-	for(int i=0;i<buf_index+1;i++){
-		std::cout<<buffer[i];
+	if(test_mode){
+		for(int i=0;i<buf_index+1;i++){
+			std::cout<<buffer[i];
+		}
+		std::cout<<"\n";
 	}
-	std::cout<<"\n";
-#endif
+}
+
+
+
+void UsbSerial::sendTempMessageToHost(Temp::TempMessage *msg){
+// struct TempMessage{
+// 	double currentTemp;
+// 	double standardTemp;
+// 	double setPoint;
+// 	double dT;
+// 	int isPeltierOn;
+// 	int isPeltierActive;
+// }
+	char tempData[6][30];
+	sprintf(tempData[0],"%3.2f, ",msg->currentTemp);
+	sprintf(tempData[1],"%3.2f, ",msg->standardTemp);
+	sprintf(tempData[2],"%3.2f, ",msg->setPoint);
+	sprintf(tempData[3],"%3.2f, ",msg->dT);
+	sprintf(tempData[4],"%d, ",msg->isPeltierOn);
+	sprintf(tempData[5],"%d\n",msg->isPeltierActive);
+
+	for(int i=0;i<6;i++){
+		udpServer->send(tempData[i],30);
+	}
 }
 
 

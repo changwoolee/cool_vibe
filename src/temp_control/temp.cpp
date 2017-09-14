@@ -6,7 +6,7 @@ using namespace std;
 
 
 Temp::Temp(int handType){
-	if(handType!=4 || handType!=5){
+	if(handType!=LEFT_HAND && handType!=RIGHT_HAND){
 		cout<<"Invalid Hand Type. Hand Type must be eithre Temp.LEFT_HAND or Temp.RIGHT_HAND"<<endl;
 		exit(1);
 	}

@@ -15,7 +15,7 @@ UdpServer::UdpServer(int port):MyThreadClass(){
 	serveraddr.sin_port=htons(port);
 
 	serveraddr.sin_addr.s_addr = htonl(INADDR_ANY);
-
+	test_mode=0;
 	if(bind(server_socket, (struct sockaddr*)&serveraddr, sizeof(serveraddr))<0){
 		perror("Cannot Bind the UDP Server\n");
 		exit(1);
@@ -37,11 +37,20 @@ void UdpServer::setTempUnits(Temp* lhand, Temp* rhand){
 	leftTempUnit = lhand;
 	rightTempUnit = rhand;
 }
-
+void UdpServer::setTestMode(int mode){
+	test_mode = mode;
+}
 
 void UdpServer::send(char* data, int length){
 
 	int len = sendto(server_socket,data,length,0,(sockaddr*)&clientaddr, sizeof(clientaddr));
+	
+	if(test_mode){
+		for(int i=0;i<length;i++){
+			std::cout<<data[i];
+		}
+		std::cout<<"\n";
+	}
 
 }
 
@@ -56,25 +65,48 @@ void UdpServer::recv(){
 	commandControl(buffer, buf_len);	
 	
 	
-#ifdef DEBUG	
-	for(int i=0;i<buf_len;i++){
-		int j = (int) buffer[i];
-		printf("%x",j);
+	if(test_mode){
+		for(int i=0;i<buf_len;i++){
+			int j = (int) buffer[i];
+			printf("%x",j);
+		}
+		cout<<endl;
 	}
-	cout<<endl;
-#endif
 
 }
 
 void UdpServer::commandControl(char* buffer, int length){
 	
 	// Analyse Command
-	// TO DO : check left or right 
-	// 	   check peltier or vibe
-	// 	   handle command	
+	//*********************************  signal sequence ************************************
+	//	[ header][ cmd type ][ hand ][ finger No. or peltier Mode ][ pwm val][ trailer ]
+	//---------------------------------------------------------------------------------------
+	// char	|	|peltier:'p'|  'l'  |finger & palm vibration motor| 	    |		|
+	// or	|  's'	|	    |  or   |		0~11		  |  0~255  |   'e'	|
+	// val	|	|vibe :  'v'|  'r'  |        peltier mode	  |	    |		|
+	// range|	|	    |	    |  'c' for cool, 'h' for hot  |	    |		|
+	//***************************************************************************************
+	
+	if(length!=6 || buffer[0]!='s'||buffer[length-1]!='e'){
+		std::cout<<"Invalid Udp Command."<<endl;
+		return;
+	}
 
-	// send vibration info to gloves
-	leftHand->send(buffer,length);
+	char mode = buffer[1];
+	char hand = buffer[2];
+	char cmd[3] = {buffer[3],buffer[4],buffer[5]};
+	// Peltier(Temp) Mode
+	if(mode=='p'){
+		Temp* tempModule = (hand=='l') ? leftTempUnit : rightTempUnit;
+		tempModule->receiveMessage(cmd,3);
+	}
+	// Vibration Mode
+	else if(mode=='v'){
+		UsbSerial* serialHand = (hand=='l') ? leftHand : rightHand;
+		serialHand->send(cmd,3);
+
+	}
+
 }
 
 void UdpServer::InternalThreadEntry(){

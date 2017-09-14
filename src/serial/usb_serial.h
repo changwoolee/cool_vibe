@@ -22,17 +22,19 @@ class UsbSerial : public MyThreadClass {
 		void set_interface_attribs(int fd, int baud_rate);
 		void send(char* data,int length);
 		void recv();
-		void setTempUnits(Temp *lhand, Temp *rhand);
-
+		void setTempUnit(Temp *tempUnit);
+		void setTestMode(int mode);
 		void setUdpServer(UdpServer *udpServer);
 		virtual void InternalThreadEntry();
 
 	private:
+		void sendTempMessageToHost(Temp::TempMessage *msg);
 		int fd;
 		char* PORT;
 		int baud_rate;
-		Temp *leftTempUnit, *rightTempUnit;
+		Temp *tempUnit;
 		UdpServer *udpServer;
+		int test_mode;
 };
 
 

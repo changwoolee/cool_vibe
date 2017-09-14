@@ -9,7 +9,7 @@
 
 using namespace std;
 class Temp{
-
+public:
 	struct PeltierMessage{
 		int mode;
 		int pwmVal;
@@ -24,7 +24,6 @@ class Temp{
 	};
 
 
-public:
 	Temp(int handType);
 	~Temp();
 	const static int LEFT_HAND_DIR = 1; // Direction, Physical Pin 12

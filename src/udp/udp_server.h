@@ -33,10 +33,11 @@ public:
 	void setLeftHand(UsbSerial *leftHand);
 	void setRightHand(UsbSerial *rightHand);
 	void setHands(UsbSerial *leftHand, UsbSerial *rightHand);
-
+	void setTestMode(int mode);
 
 	virtual void InternalThreadEntry();
 private:
+	
 	int server_socket;
 	int port;
 	struct sockaddr_in clientaddr;
@@ -45,6 +46,8 @@ private:
 	UsbSerial *leftHand, *rightHand;
 
 	char buffer[100];
+	
+	int test_mode;
 
 	void commandControl(char* buffer, int length);
 
