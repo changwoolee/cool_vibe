@@ -96,7 +96,7 @@ void UdpServer::commandControl(char* buffer, int length){
 	char hand = buffer[2];
 	// Peltier(Temp) Mode
 	if(mode=='p'){
-		char cmd[2] = {buffer[3],buffer[4],buffer[5]};
+		char cmd[3] = {buffer[3],buffer[4],buffer[5]};
 		Temp* tempModule = (hand=='l') ? leftTempUnit : rightTempUnit;
 		tempModule->receiveMessage(cmd,3);
 	}
