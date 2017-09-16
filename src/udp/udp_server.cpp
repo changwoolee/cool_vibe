@@ -6,6 +6,8 @@ UdpServer::UdpServer(int port):MyThreadClass(){
 		perror("Cannot create socket\n");
 		exit(1);
 	}
+	this->leftHand = NULL;
+	this->rightHand = NULL;
 
 	this->port = port;
 	struct sockaddr_in serveraddr;
@@ -85,6 +87,7 @@ void UdpServer::commandControl(char* buffer, int length){
 	// or	|  's'	|	    |  or   |		0~11		  |  0~255  |   'e'	|
 	// val	|	|vibe :  'v'|  'r'  |        peltier mode	  |	    |		|
 	// range|	|	    |	    |  'c' for cool, 'h' for hot  |	    |		|
+	// 	|   	|	    |	    |  'x' for stop, 'r' for reset| 	    |		|
 	//***************************************************************************************
 	
 	if(length!=6 || buffer[0]!='s'||buffer[length-1]!='e'){
@@ -98,14 +101,18 @@ void UdpServer::commandControl(char* buffer, int length){
 	if(mode=='p'){
 		char cmd[3] = {buffer[3],buffer[4],buffer[5]};
 		Temp* tempModule = (hand=='l') ? leftTempUnit : rightTempUnit;
-		tempModule->receiveMessage(cmd,3);
+		if(tempModule!=NULL){
+			tempModule->receiveMessage(cmd,3);
+		}
 	}
 	// Vibration Mode
 	else if(mode=='v')
 	{
 		char cmd[4] = {buffer[3],buffer[4],0,buffer[5]};
 		UsbSerial* serialHand = (hand=='l') ? leftHand : rightHand;
-		serialHand->send(cmd,4);
+		if(serialHand!=NULL){
+			serialHand->send(cmd,4);
+		}
 
 	}
 

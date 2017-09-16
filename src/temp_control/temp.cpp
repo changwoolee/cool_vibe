@@ -186,10 +186,19 @@ void Temp::receiveMessage(char *message, int length){
 		cout<<"Invalid Peltier Command.\n";
 		return;
 	}
-	int mode = message[0]=='c' ? (LOW) : (HIGH);
+	int mode;
+	switch(message[0]){
+		case 'x' : mode = OFF; break;
+		case 'c' : mode = COOL; break;
+		case 'h' : mode = HOT; break;
+		case 'r' : mode = RESET; break;
+		default : mode = OFF; break;
+	}
+
+
 	int pwmVal = (int)message[1];
 
-	if(mode!='c' || mode!='h'){
+	if(mode!='c' || mode!='h'||mode!='x'){
 		cout<<"Invalid Peltier Command. Peltier Command must be either 'c' or 'h'"<<endl;
 		return;
 	}

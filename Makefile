@@ -1,5 +1,5 @@
 CC = g++
-CFLAGS = -W -Wall
+CFLAGS = -W -Wall -O2 -DNDEBUG
 serial_test = build/examples/serial_test
 udp_test = build/examples/udp_test
 comm_test = build/examples/comm_test

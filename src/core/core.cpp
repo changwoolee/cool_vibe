@@ -12,8 +12,10 @@ int main(int argc, char* argv[]){
 
 	UsbSerial lhand("/dev/ttyACM0",115200,&udpServer);
 	lhand.setTempUnit(&tempUnitLeft);
+	lhand.setHandType(UsbSerial::LEFT);
 	//UsbSerial rhand("dev/ttyACM1",115200,&udpServer);
 	//rhand.setTempUnit(&tempUnitRight);
+	//rhand.setHandType(UsbSerial::RIGHT);
 	
 	udpServer.setLeftHand(&lhand);
 	//udpServer.setHands(&lhand, &rhand);

@@ -19,6 +19,7 @@ class UsbSerial : public MyThreadClass {
 		UsbSerial(char* PORT, int baud_rate);
 		UsbSerial(char* PORT, int baud_rate, UdpServer *udpServer);
 		~UsbSerial();
+		void setHandType(int type);
 		void set_interface_attribs(int fd, int baud_rate);
 		void send(char* data,int length);
 		void recv();
@@ -26,6 +27,9 @@ class UsbSerial : public MyThreadClass {
 		void setTestMode(int mode);
 		void setUdpServer(UdpServer *udpServer);
 		virtual void InternalThreadEntry();
+		
+		static const int LEFT = 0;
+		static const int RIGHT = 1;
 
 	private:
 		void sendTempMessageToHost(Temp::TempMessage *msg);
@@ -35,6 +39,8 @@ class UsbSerial : public MyThreadClass {
 		Temp *tempUnit;
 		UdpServer *udpServer;
 		int test_mode;
+		int handType;
+
 };
 
 
