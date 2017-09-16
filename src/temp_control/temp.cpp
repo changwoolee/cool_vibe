@@ -22,11 +22,16 @@ Temp::Temp(int handType){
 	
 	if(hand==LEFT_HAND){
 		pinMode(LEFT_HAND_DIR,OUTPUT);
+		coolerPin = LEFT_HAND_COOLER;
+		pinMode(LEFT_HAND_COOLER,OUTPUT);
 		dirPin = LEFT_HAND_DIR;
 	}
 	else{
+		
 		pinMode(RIGHT_HAND_DIR,OUTPUT);
 		dirPin = RIGHT_HAND_DIR;
+		pinMode(RIGHT_HAND_COOLER,OUTPUT);
+		coolerPin = RIGHT_HAND_COOLER;
 	}
 
 
@@ -110,6 +115,7 @@ void Temp::controlPeltier(double temp){
 	tempMessage->dT = temp-tempMessage->standardTemp;
 	tempMessage->isPeltierOn = isOn;
 	tempMessage->isPeltierActive = isActive;
+	tempMessage->mode = currentMode;
 	double dT = tempMessage->dT;
 	if((dT>5||dT<-5||tempMessage->currentTemp==-1)&&isOn){
 		
@@ -121,6 +127,13 @@ void Temp::controlPeltier(double temp){
 		}
 		return;
 
+	}
+	
+	if(dT<-0.5 || dT>0.5){
+		digitalWrite(coolerPin,HIGH);
+	}
+	else{
+		digitalWrite(coolerPin,LOW);
 	}
 
 	if(!messageQueue.empty()){
@@ -198,7 +211,7 @@ void Temp::receiveMessage(char *message, int length){
 
 	int pwmVal = (int)message[1];
 
-	if(mode!='c' || mode!='h'||mode!='x'){
+	if(mode!='c' && mode!='h'&& mode!='x'){
 		cout<<"Invalid Peltier Command. Peltier Command must be either 'c' or 'h'"<<endl;
 		return;
 	}

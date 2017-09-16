@@ -46,6 +46,7 @@ int main(int argc, char* argv[]){
 	}
 				
 		
+	std::cout<<"Rpi Core Ready\n";
 
 
 	udpServer.WaitForInternalThreadToExit();

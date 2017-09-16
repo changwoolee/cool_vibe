@@ -47,7 +47,7 @@ void UsbSerial::set_interface_attribs(int fd,int baud_rate){
 }
 
 void UsbSerial::setHandType(int type){
-	if(type!=1 && type!=2){
+	if(type!=UsbSerial::LEFT && type!=UsbSerial::RIGHT){
 		std::cout<<"Invalid Hand type."<<std::endl;
 		exit(1);
 
@@ -138,14 +138,15 @@ void UsbSerial::sendTempMessageToHost(Temp::TempMessage *msg){
 // 	int isPeltierOn;
 // 	int isPeltierActive;
 // }
-	char tempData[7][30];
-	sprintf(tempData[0],"%d, ",handType);
-	sprintf(tempData[1],"%3.2f, ",msg->currentTemp);
-	sprintf(tempData[2],"%3.2f, ",msg->standardTemp);
-	sprintf(tempData[3],"%3.2f, ",msg->setPoint);
-	sprintf(tempData[4],"%3.2f, ",msg->dT);
-	sprintf(tempData[5],"%d, ",msg->isPeltierOn);
-	sprintf(tempData[6],"%d\n",msg->isPeltierActive);
+	char tempData[8][30];
+	sprintf(tempData[0],"%d,",handType);
+	sprintf(tempData[1],"%3.2f,",msg->currentTemp);
+	sprintf(tempData[2],"%3.2f,",msg->standardTemp);
+	sprintf(tempData[3],"%3.2f,",msg->setPoint);
+	sprintf(tempData[4],"%3.2f,",msg->dT);
+	sprintf(tempData[5],"%d,",msg->isPeltierOn);
+	sprintf(tempData[6],"%d,",msg->isPeltierActive);
+	sprintf(tempData[7],"%d",msg->mode);
 
 	for(int i=0;i<7;i++){
 		udpServer->send(tempData[i],30);

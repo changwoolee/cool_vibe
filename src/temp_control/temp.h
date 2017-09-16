@@ -21,6 +21,7 @@ public:
 		double dT;
 		int isPeltierOn;
 		int isPeltierActive;
+		int mode;
 	};
 
 
@@ -30,6 +31,11 @@ public:
 	const static int LEFT_HAND = 4; // PWM, Physical Pin 16
 	const static int RIGHT_HAND_DIR = 5; //Direction, Physical Pin 18
 	const static int RIGHT_HAND = 6; // PWM, Physical Pin 22
+	
+	const static int LEFT_HAND_COOLER=24;
+	const static int RIGHT_HAND_COOLER=25;
+	
+
 	const static int COOL = LOW;
 	const static int HOT = HIGH;
 	const static int OFF = 2;
@@ -53,6 +59,7 @@ private:
 	queue<PeltierMessage> messageQueue;
 	int hand;
 	int dirPin;
+	int coolerPin;
 	int isHandInit;
 	int isOn;
 	int isActive;
